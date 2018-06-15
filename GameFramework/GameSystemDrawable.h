@@ -39,6 +39,7 @@
 		public:
 			virtual std::string getTypeDrawable() = 0;
 			virtual sf::Drawable* PresentDrawable() = 0;
+			virtual void UpdateDrawable() = 0;
 			void deleteItem();
 			void setClickEventHandler(DrawableClickEvent Handler);
 			void setMouseMoveEventHandler(DrawableMouseMoveEvent Handler);
@@ -62,9 +63,9 @@
 			virtual void setSize(unsigned int Width, unsigned int Height);
 			virtual void setWidth(unsigned int Width);
 			virtual void setHeight(unsigned int Height);
-			sf::Vector2u getSize();
-			unsigned int getWidth();
-			unsigned int getHeight();
+			virtual sf::Vector2u getSize();
+			virtual unsigned int getWidth();
+			virtual unsigned int getHeight();
 		};
 		
 		class DrawableImage : public DrawableItem {
@@ -74,14 +75,13 @@
 			sf::Texture m_Texture;
 			sf::Sprite m_TempSpriteForPresent;
 			bool m_Stretch = true;
-			float m_Rotation = 0.0f;
-			sf::Color m_ColorFilter;
-			bool m_Smooth = true;
 		public:
 			DrawableImage(const sf::Texture &TextureToDraw);
 			DrawableImage(DrawableImage &LeftImage);
 			std::string getTypeDrawable();
 			sf::Drawable* PresentDrawable();
+			void UpdateDrawable();
+			
 			
 			void UpdateTexture(const sf::Texture& TextureToDraw, bool AdjustSize = false);
 
@@ -96,8 +96,67 @@
 
 			void setSmooth(bool Smooth);
 			bool getSmooth();
+
+			void setRepeat(bool Repeat);
+			bool getRepeat();
+
+			void setPosition(sf::Vector2f Position);
+			void setPosition(float Left, float Top);
+			void setLeft(float Left);
+			void setTop(float Top);
+			void setSize(sf::Vector2u Size);
+			void setSize(unsigned int Width, unsigned int Height);
+			void setWidth(unsigned int Width);
+			void setHeight(unsigned int Height);
 		};
-		
+		class DrawableText : public DrawableItem {
+		private:
+
+		protected:
+			sf::Text m_TempTextForPresent;
+
+		public:
+			DrawableText(const sf::Font Font, sf::String TextString);
+			DrawableText(DrawableText& OldText);
+			std::string getTypeDrawable();
+			sf::Drawable* PresentDrawable();
+			void UpdateDrawable();
+
+			void setStyle(sf::Uint32 Style);
+			sf::Uint32 getStyle();
+
+			void setFont(sf::Font font);
+			sf::Font getFont();
+			
+			void setTextString(sf::String TextString);
+			sf::String getTextString();
+
+			void setFontSize(unsigned int SizeInPixel);
+			unsigned int getFontSize();
+
+			void setOutlineThickness(float Thickness);
+			float getOutlineThickness();
+
+			void setFillColor(sf::Color FillColor);
+			sf::Color getFillColor();
+
+			void setOutLineColor(sf::Color OutLineColor);
+			sf::Color getOutLineColor();
+
+			void setLetterSpacing(float SpacingFactor);
+			float getLetterSpacing();
+
+			void setLineSpacing(float SpacingFactor);
+			float getLineSpacing();
+
+			void setPosition(sf::Vector2f Position);
+			void setPosition(float Left, float Top);
+			void setLeft(float Left);
+			void setTop(float Top);
+			sf::Vector2u getSize();
+			unsigned int getWidth();
+			unsigned int getHeight();
+		};
 	}
 	
 #endif

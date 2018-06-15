@@ -15,7 +15,7 @@ Game Engines are popular nowadays. Each day tons of new engines pop up. We aims 
 - [ ] Drawable Item
      - [x] DrawableItem Wrapper Class 
      - [x] DrawableImage Class 
-     - [ ] DrawableText Class
+     - [x] DrawableText Class
      - [ ] DrawableImageSerie Class
 - [ ] Activity(Game Scene)
      - [ ] DrawableItem Holder
