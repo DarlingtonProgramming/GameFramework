@@ -515,3 +515,201 @@ unsigned int GameSystem::DrawableText::getHeight()
 	sf::FloatRect MyGlobalRect = this->m_TempTextForPresent.getGlobalBounds();
 	return static_cast<unsigned int>(MyGlobalRect.height);
 }
+
+GameSystem::DrawableImageSerie::DrawableImageSerie(const std::vector<std::pair<sf::Texture, float>>& TexturesToDraw)
+{
+	this->UpdateTextures(TexturesToDraw,true);
+}
+
+GameSystem::DrawableImageSerie::DrawableImageSerie(DrawableImageSerie & OldImageSerie)
+{
+	DrawableItem::CopyFrom(OldImageSerie);
+	this->m_DeviateTime = OldImageSerie.m_DeviateTime;
+	this->m_LockedTime = OldImageSerie.m_LockedTime;
+	this->m_isClockLocked = OldImageSerie.m_isClockLocked;
+	this->m_SharedClock = OldImageSerie.m_SharedClock;
+	this->m_Textures = OldImageSerie.m_Textures;
+	this->m_TempSpriteForPresent = OldImageSerie.m_TempSpriteForPresent;
+	this->m_Stretch = OldImageSerie.m_Stretch;
+	this->m_Smooth = OldImageSerie.m_Smooth;
+	this->m_Repeat = OldImageSerie.m_Repeat;
+}
+
+std::string GameSystem::DrawableImageSerie::getTypeDrawable()
+{
+	return "DrawableImageSerie";
+}
+
+sf::Drawable * GameSystem::DrawableImageSerie::PresentDrawable()
+{
+	this->UpdateDrawable();
+	return &this->m_TempSpriteForPresent;
+}
+void GameSystem::DrawableImageSerie::UpdateDrawable()
+{
+	sf::Texture TempDisplayTexture;
+	float nowTimeF = 0.0f;
+	if (!this->m_isClockLocked) {
+		sf::Time nowTime = this->m_SharedClock.getElapsedTime();
+		nowTimeF = nowTime.asSeconds() + this->m_DeviateTime;
+	}
+	else {
+		nowTimeF = this->m_LockedTime;
+	}
+	unsigned int Order = 0U;
+	for (auto i = this->m_Textures.begin(); i != this->m_Textures.end(); i++) {
+		if ((*i).second <= nowTimeF) {
+			nowTimeF -= (*i).second;
+			Order++;
+		}
+		else {
+			break;
+		}
+	}
+	if (Order > this->m_Textures.size() - 1) {
+		//Overtime, refresh cycle
+		if (this->m_isClockLocked) {
+			this->m_LockedTime = nowTimeF;
+		}
+		else {
+			this->m_DeviateTime = nowTimeF;
+			this->m_SharedClock.restart();
+		}
+		return this->UpdateDrawable();
+	}
+	
+	TempDisplayTexture = this->m_Textures[Order].first;
+	TempDisplayTexture.setRepeated(this->m_Repeat);
+	TempDisplayTexture.setSmooth(this->m_Smooth);
+	
+	this->m_TempSpriteForPresent.setTexture(TempDisplayTexture);
+	if (this->m_Stretch) {
+		sf::Vector2u TextureSize = TempDisplayTexture.getSize();
+
+		float SpriteXScale = 0.0f, SpriteYScale = 0.0f;
+		SpriteXScale = static_cast<float>(this->getWidth()) / static_cast<float>(TextureSize.x);
+		SpriteYScale = static_cast<float>(this->getHeight()) / static_cast<float>(TextureSize.y);
+		this->m_TempSpriteForPresent.setScale(SpriteXScale, SpriteYScale);
+	}
+	return;
+}
+void GameSystem::DrawableImageSerie::UpdateTextures(const std::vector<std::pair<sf::Texture, float>>& TexturesToDraw, bool AdjustSize)
+{
+	this->m_Textures = TexturesToDraw;
+	if (AdjustSize) {
+		sf::Vector2u NewTextSize = TexturesToDraw[0].first.getSize();
+		DrawableItem::setSize(NewTextSize);
+	}
+	this->m_LockedTime = 0.0f;
+	this->m_DeviateTime = 0.0f;
+	this->m_SharedClock.restart();
+}
+void GameSystem::DrawableImageSerie::setStretch(bool Value)
+{
+	bool needUpdateImageSerie = Value != this->m_Stretch;
+	this->m_Stretch = Value;
+	if (needUpdateImageSerie) {
+		this->UpdateDrawable();
+	}
+}
+bool GameSystem::DrawableImageSerie::getStretch()
+{
+	return this->m_Stretch;
+}
+void GameSystem::DrawableImageSerie::setPosition(sf::Vector2f Position)
+{
+	DrawableItem::setPosition(Position);
+	this->m_TempSpriteForPresent.setPosition(Position);
+}
+
+void GameSystem::DrawableImageSerie::setPosition(float Left, float Top)
+{
+	DrawableItem::setPosition(Left, Top);
+	this->m_TempSpriteForPresent.setPosition(Left, Top);
+}
+
+void GameSystem::DrawableImageSerie::setLeft(float Left)
+{
+	sf::Vector2f OldPos = this->m_TempSpriteForPresent.getPosition();
+	DrawableItem::setLeft(Left);
+	this->m_TempSpriteForPresent.setPosition(Left, OldPos.y);
+}
+
+void GameSystem::DrawableImageSerie::setTop(float Top)
+{
+	sf::Vector2f OldPos = this->m_TempSpriteForPresent.getPosition();
+	DrawableItem::setTop(Top);
+	this->m_TempSpriteForPresent.setPosition(OldPos.x, Top);
+}
+
+void GameSystem::DrawableImageSerie::setSize(sf::Vector2u Size)
+{
+	DrawableItem::setSize(Size);
+	this->UpdateDrawable();
+}
+
+void GameSystem::DrawableImageSerie::setSize(unsigned int Width, unsigned int Height)
+{
+	DrawableItem::setSize(Width, Height);
+	this->UpdateDrawable();
+}
+
+void GameSystem::DrawableImageSerie::setWidth(unsigned int Width)
+{
+	DrawableItem::setWidth(Width);
+	this->UpdateDrawable();
+}
+
+void GameSystem::DrawableImageSerie::setHeight(unsigned int Height)
+{
+	DrawableItem::setHeight(Height);
+	this->UpdateDrawable();
+}
+
+void GameSystem::DrawableImageSerie::setRotation(float Angle)
+{
+	this->m_TempSpriteForPresent.setRotation(Angle);
+}
+
+float GameSystem::DrawableImageSerie::getRotation()
+{
+	return this->m_TempSpriteForPresent.getRotation();
+}
+
+void GameSystem::DrawableImageSerie::setColorFilter(sf::Color ColorFilter)
+{
+	this->m_TempSpriteForPresent.setColor(ColorFilter);
+}
+
+sf::Color GameSystem::DrawableImageSerie::getColorFilter()
+{
+	return this->m_TempSpriteForPresent.getColor();
+}
+
+void GameSystem::DrawableImageSerie::setSmooth(bool Smooth)
+{
+	bool needUpdateDrawableSerie = this->m_Smooth != Smooth;
+	this->m_Smooth = Smooth;
+	if (needUpdateDrawableSerie) {
+		this->UpdateDrawable();
+	}
+}
+
+bool GameSystem::DrawableImageSerie::getSmooth()
+{
+	return this->m_Smooth;
+}
+
+void GameSystem::DrawableImageSerie::setRepeat(bool Repeat)
+{
+	bool needUpdateDrawableSerie = this->m_Repeat != Repeat;
+	this->m_Repeat = Repeat;
+	if (needUpdateDrawableSerie) {
+		this->UpdateDrawable();
+	}
+}
+
+bool GameSystem::DrawableImageSerie::getRepeat()
+{
+	return this->m_Repeat;
+}

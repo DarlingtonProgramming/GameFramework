@@ -122,6 +122,7 @@
 			sf::Drawable* PresentDrawable();
 			void UpdateDrawable();
 
+
 			void setStyle(sf::Uint32 Style);
 			sf::Uint32 getStyle();
 
@@ -156,6 +157,52 @@
 			sf::Vector2u getSize();
 			unsigned int getWidth();
 			unsigned int getHeight();
+		};
+		class DrawableImageSerie : public DrawableItem {
+		private:
+			float m_DeviateTime = 0.0f;
+			float m_LockedTime = 0.0f;
+			bool m_isClockLocked = false;
+			sf::Clock m_SharedClock;
+		protected:
+			std::vector<std::pair<sf::Texture, float>> m_Textures;
+			sf::Sprite m_TempSpriteForPresent;
+			bool m_Stretch = true;
+			bool m_Smooth = true;
+			bool m_Repeat = false;
+		public:
+			DrawableImageSerie(const std::vector<std::pair<sf::Texture, float>>& TexturesToDraw);
+			DrawableImageSerie(DrawableImageSerie& OldImageSerie);
+
+			std::string getTypeDrawable();
+			sf::Drawable* PresentDrawable();
+			void UpdateDrawable();
+
+			void UpdateTextures(const std::vector<std::pair<sf::Texture,float>>& TexturesToDraw, bool AdjustSize = false);
+
+			void setStretch(bool Value);
+			bool getStretch();
+
+			void setRotation(float Angle);
+			float getRotation();
+
+			void setColorFilter(sf::Color ColorFilter);
+			sf::Color getColorFilter();
+
+			void setSmooth(bool Smooth);
+			bool getSmooth();
+
+			void setRepeat(bool Repeat);
+			bool getRepeat();
+
+			void setPosition(sf::Vector2f Position);
+			void setPosition(float Left, float Top);
+			void setLeft(float Left);
+			void setTop(float Top);
+			void setSize(sf::Vector2u Size);
+			void setSize(unsigned int Width, unsigned int Height);
+			void setWidth(unsigned int Width);
+			void setHeight(unsigned int Height);
 		};
 	}
 	

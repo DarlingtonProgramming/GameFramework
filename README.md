@@ -12,11 +12,11 @@ Game Engines are popular nowadays. Each day tons of new engines pop up. We aims 
 
 ## To-Do List
 
-- [ ] Drawable Item
+- [x] Drawable Item(Not tested)
      - [x] DrawableItem Wrapper Class 
      - [x] DrawableImage Class 
      - [x] DrawableText Class
-     - [ ] DrawableImageSerie Class
+     - [x] DrawableImageSerie Class
 - [ ] Activity(Game Scene)
      - [ ] DrawableItem Holder
      - [ ] Trash Recycle
